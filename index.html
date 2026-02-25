@@ -1,0 +1,237 @@
+# Ftc-Regular-healty-Food-s-corner
+Health Organisations required corner 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JDR Fruit Sales & Inventory System</title>
+    <style>
+        :root {
+            --primary: #27ae60;
+            --primary-dark: #1e8449;
+            --secondary: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #f4f7f6;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--light); display: flex; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; height: 100vh; background: var(--dark); color: white; position: fixed; padding: 20px; }
+        .sidebar h2 { color: var(--primary); margin-bottom: 30px; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .menu-item { padding: 15px; cursor: pointer; border-radius: 8px; transition: 0.3s; margin-bottom: 5px; }
+        .menu-item:hover, .menu-item.active { background: var(--primary); }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; width: calc(100% - 260px); padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; }
+        .stat-card h3 { font-size: 24px; color: var(--dark); }
+        .stat-card p { color: #888; font-size: 14px; }
+
+        /* Sales Section */
+        .content-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: var(--shadow); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        
+        /* Invoice/Memo Box */
+        .invoice-box { background: #fff; border: 2px dashed #ccc; padding: 20px; border-radius: 10px; }
+        .invoice-header { text-align: center; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+        .btn-print { background: var(--dark); color: white; width: 100%; margin-top: 10px; }
+
+        /* Stock Badge */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; color: white; }
+        .bg-success { background: var(--primary); }
+        .bg-danger { background: var(--danger); }
+
+        @media print {
+            .sidebar, .header, .btn, .card:first-child { display: none; }
+            .main-content { margin: 0; width: 100%; }
+            .invoice-box { border: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>JDR Software</h2>
+        <div class="menu-item active">📊 Dashboard</div>
+        <div class="menu-item">🍎 Inventory</div>
+        <div class="menu-item">🛒 Sales History</div>
+        <div class="menu-item">🧾 Reports</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h3>আশরাফ, আপনার আজকের আপডেট</h3>
+            <div style="font-weight: bold; color: var(--primary);">User: Admin</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p>আজকের মোট বিক্রি</p>
+                <h3 id="totalSalesDisplay">৳ ০</h3>
+            </div>
+            <div class="stat-card">
+                <p>মোট লাভ</p>
+                <h3 id="totalProfitDisplay" style="color: var(--primary);">৳ ০</h3>
+            </div>
+            <div class="stat-card">
+                <p>স্টক আইটেম</p>
+                <h3 id="totalStockDisplay">০ কেজি</h3>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3>ফ্রুটস লিস্ট ও স্টক</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ফলের নাম</th>
+                            <th>স্টক</th>
+                            <th>দাম (কেজি)</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTable">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>ক্যাশ মেমো (Invoice)</h3>
+                <div class="invoice-box" id="printArea">
+                    <div class="invoice-header">
+                        <h4>JDR Foods Corner</h4>
+                        <small>ঢাকা, বাংলাদেশ | ০১৭XXXXXXXX</small>
+                    </div>
+                    <div id="invoiceItems">
+                        <p style="text-align: center; color: #888;">কোনো আইটেম সিলেক্ট করা হয়নি</p>
+                    </div>
+                    <hr style="margin: 15px 0;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                        <span>Total:</span>
+                        <span id="invoiceTotal">৳ ০</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="confirmSale()">বিক্রি সম্পন্ন করুন</button>
+                <button class="btn btn-print" onclick="window.print()">মেমো প্রিন্ট করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ১. ডেটাবেজ (লোকাল ভেরিয়েবল)
+        let inventory = [
+            { id: 1, name: "আপেল", stock: 100, buyPrice: 180, sellPrice: 220 },
+            { id: 2, name: "কমলা", stock: 80, buyPrice: 140, sellPrice: 190 },
+            { id: 3, name: "মাল্টা", stock: 60, buyPrice: 160, sellPrice: 210 },
+            { id: 4, name: "কলা (ডজন)", stock: 50, buyPrice: 70, sellPrice: 100 }
+        ];
+
+        let currentCart = [];
+        let totalSales = 0;
+        let totalProfit = 0;
+
+        // ২. প্রোডাক্ট টেবিল রেন্ডার করা
+        function renderProducts() {
+            const table = document.getElementById('productTable');
+            table.innerHTML = "";
+            inventory.forEach(item => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td><span class="badge ${item.stock > 10 ? 'bg-success' : 'bg-danger'}">${item.stock}</span></td>
+                        <td>৳ ${item.sellPrice}</td>
+                        <td><button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="addToCart(${item.id})">+ Add</button></td>
+                    </tr>
+                `;
+            });
+            updateStats();
+        }
+
+        // ৩. কার্টে যোগ করা
+        function addToCart(id) {
+            const item = inventory.find(i => i.id === id);
+            if(item.stock <= 0) return alert("স্টক শেষ!");
+
+            const cartItem = currentCart.find(c => c.id === id);
+            if(cartItem) {
+                cartItem.qty++;
+            } else {
+                currentCart.push({ ...item, qty: 1 });
+            }
+            renderInvoice();
+        }
+
+        // ৪. মেমো রেন্ডার করা
+        function renderInvoice() {
+            const container = document.getElementById('invoiceItems');
+            const totalDisplay = document.getElementById('invoiceTotal');
+            let total = 0;
+
+            if(currentCart.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: #888;">কোনো আইটেম সিলেক্ট করা হয়নি</p>`;
+                totalDisplay.innerText = "৳ ০";
+                return;
+            }
+
+            container.innerHTML = currentCart.map(item => {
+                total += (item.sellPrice * item.qty);
+                return `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>${item.name} x ${item.qty}</span>
+                        <span>৳ ${item.sellPrice * item.qty}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            totalDisplay.innerText = `৳ ${total}`;
+        }
+
+        // ৫. বিক্রি নিশ্চিত করা
+        function confirmSale() {
+            if(currentCart.length === 0) return alert("কার্ট খালি!");
+
+            currentCart.forEach(cartItem => {
+                const product = inventory.find(p => p.id === cartItem.id);
+                product.stock -= cartItem.qty;
+                
+                totalSales += (cartItem.sellPrice * cartItem.qty);
+                totalProfit += (cartItem.sellPrice - cartItem.buyPrice) * cartItem.qty;
+            });
+
+            alert("বিক্রি সফল হয়েছে!");
+            currentCart = [];
+            renderProducts();
+            renderInvoice();
+        }
+
+        // ৬. ড্যাশবোর্ড আপডেট
+        function updateStats() {
+            document.getElementById('totalSalesDisplay').innerText = `৳ ${totalSales}`;
+            document.getElementById('totalProfitDisplay').innerText = `৳ ${totalProfit}`;
+            const totalStock = inventory.reduce((acc, item) => acc + item.stock, 0);
+            document.getElementById('totalStockDisplay').innerText = `${totalStock} কেজি`;
+        }
+
+        // শুরুতে রেন্ডার
+        renderProducts();
+    </script>
+</body>
+</html>
+![Screenshot_2026-02-24-22-54-53-223_com facebook katana](https://github.com/user-attachments/assets/fd03dc95-13e0-472c-9c2d-159f8ff1c987)
+![IMG_20260225_055920](https://github.com/user-attachments/assets/d3e6c498-77d2-4de6-922d-10574672d18d)
+![Screenshot_2026-02-25-12-21-29-958_com facebook katana](https://github.com/user-attachments/assets/354ed21a-a9bf-4d32-9220-852347466106)
